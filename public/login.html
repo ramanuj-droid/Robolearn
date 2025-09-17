@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login/Register</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 flex items-center justify-center h-screen">
+
+  <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
+    <div class="flex justify-around mb-4">
+      <button id="loginTab" class="w-1/2 py-2 font-bold border-b-2 border-blue-500">Login</button>
+      <button id="registerTab" class="w-1/2 py-2 font-bold border-b-2 border-transparent">Register</button>
+    </div>
+
+    <form id="loginForm" class="space-y-4">
+      <label class="block text-gray-600 mb-1">Email</label>
+      <input type="email" id="loginEmail" placeholder="Email" class="w-full bg-gray-200 p-2 border rounded">
+      
+      <label class="block text-gray-600 mb-1">Password</label>
+      <input type="password" id="loginPassword" placeholder="Password" class="w-full bg-gray-200 p-2 border rounded">
+      
+      <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded">Login</button>
+    </form>
+
+    <form id="registerForm" class="space-y-4 hidden">
+      <label class="block text-gray-600 mb-1">Username</label>
+      <input type="text" id="registerUsername" placeholder="Username" class="w-full p-1 border rounded">
+      
+      <label class="block text-gray-600 mb-1">Email</label>
+      <input type="email" id="registerEmail" placeholder="Email" class="w-full p-1 border rounded">
+      
+      <label class="block text-gray-600 mb-1">Password</label>
+      <input type="password" id="registerPassword" placeholder="Password" class="w-full p-2 border rounded">
+      
+      <button type="submit" class="w-full bg-green-500 text-white py-2 rounded">Register</button>
+    </form>
+
+    <p id="message" class="mt-4 text-center text-sm text-red-500"></p>
+  </div>
+
+  <script>
+    const loginTab = document.getElementById("loginTab");
+    const registerTab = document.getElementById("registerTab");
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+    const message = document.getElementById("message");
+
+    loginTab.addEventListener("click", () => {
+      loginForm.classList.remove("hidden");
+      registerForm.classList.add("hidden");
+      loginTab.classList.add("border-blue-500");
+      registerTab.classList.remove("border-blue-500");
+      message.textContent = "";
+    });
+
+    registerTab.addEventListener("click", () => {
+      registerForm.classList.remove("hidden");
+      loginForm.classList.add("hidden");
+      registerTab.classList.add("border-blue-500");
+      loginTab.classList.remove("border-blue-500");
+      message.textContent = "";
+    });
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+
+      try {
+        const res = await fetch("http://localhost:5000/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          message.textContent = "✅ " + data.message;
+          message.classList.remove("text-red-500");
+          message.classList.add("text-green-500");
+
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("userId", data.user._id); // ← important fix
+
+          setTimeout(() => {
+            window.location.href = "home.html";
+          }, 1000);
+        } else {
+          message.textContent = "❌ " + data.message;
+          message.classList.remove("text-green-500");
+          message.classList.add("text-red-500");
+        }
+      } catch (err) {
+        message.textContent = "❌ Server error";
+      }
+    });
+
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("registerUsername").value;
+      const email = document.getElementById("registerEmail").value;
+      const password = document.getElementById("registerPassword").value;
+
+      try {
+        const res = await fetch("http://localhost:5000/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, password }),
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          message.textContent = data.message;
+          message.classList.remove("text-red-500");
+          message.classList.add("text-green-500");
+        } else {
+          message.textContent = data.message;
+          message.classList.remove("text-green-500");
+          message.classList.add("text-red-500");
+        }
+      } catch (err) {
+        message.textContent = "Server error";
+      }
+    });
+  </script>
+</body>
+</html>

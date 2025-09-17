@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Robolearn</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .animate-float { animation: float 3s ease-in-out infinite; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-900 to-black min-h-screen flex">
+
+  <aside class="fixed top-0 left-0 h-full w-64 bg-blue-800 text-white shadow-lg p-6 flex flex-col">
+    <h2 class="text-2xl font-bold mb-8">🤖 Robolearn</h2>
+
+    <nav class="flex flex-col gap-4">
+      <a href="#" class="hover:bg-blue-600 px-4 py-2 rounded-lg">Track Progress</a>
+      <a href="#" class="hover:bg-blue-600 px-4 py-2 rounded-lg">Profile</a>
+      <a href="#" class="hover:bg-blue-600 px-4 py-2 rounded-lg">History</a>
+      <a href="#" class="hover:bg-blue-600 px-4 py-2 rounded-lg">Settings</a>
+    </nav>
+
+    <div class="flex-grow"></div>
+
+    <a href="index.html" id="logoutBtn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg font-semibold inline-block text-center">
+  Logout
+</a>
+
+  </aside>
+
+  <div class="flex-grow ml-64 flex flex-col">
+
+    <header class="bg-blue-600 p-6 flex justify-between items-center shadow-lg">
+      <p class="text-3xl text-white font-bold">Dashboard</p>
+      <p id="welcomeText" class="text-white text-lg">Welcome, User 👋</p>
+    </header>
+
+ 
+    <main class="flex-grow flex flex-col px-6 py-10">
+      <div class="grid md:grid-cols-2 gap-12 w-full max-w-6xl mx-auto">
+
+<div class="bg-white bg-opacity-10 backdrop-blur-md rounded-xl p-6 shadow-lg text-white w-full max-w-4xl mx-auto mb-12">
+  <p class="text-3xl font-bold mb-6 text-center">Recommended Roadmaps</p>
+
+  <div class="flex flex-col gap-4">
+    <!--1-->
+    <div class="bg-blue-600 rounded-xl p-4 w-full text-center shadow-lg transform animate-float hover:scale-105 transition duration-300">
+      <h3 class="text-xl font-semibold mb-2">Learn AI</h3>
+      <p class="text-white text-sm">Learn AI at your own pace with structured lessons and exercises.</p>
+    </div>
+
+    <!--2-->
+    <div class="bg-blue-600 rounded-xl p-4 w-full text-center shadow-lg transform animate-float hover:scale-105 transition duration-300">
+      <h3 class="text-xl font-semibold mb-2">Create Projects</h3>
+      <p class="text-white text-sm">Apply your knowledge by building real-world projects.</p>
+    </div>
+
+    <!--3-->
+    <div class="bg-blue-600 rounded-xl p-4 w-full text-center shadow-lg transform animate-float hover:scale-105 transition duration-300">
+      <h3 class="text-xl font-semibold mb-2">Upskill</h3>
+      <p class="text-white text-sm">Enhance your career prospects with hands-on skills.</p>
+    </div>
+
+    <!--4-->
+    <div class="bg-blue-600 rounded-xl p-4 w-full text-center shadow-lg transform animate-float hover:scale-105 transition duration-300">
+      <h3 class="text-xl font-semibold mb-2">Community</h3>
+      <p class="text-white text-sm">Collaborate and learn with like-minded peers.</p>
+    </div>
+  </div>
+</div>
+
+        <!-- Roadmap Form -->
+        <form id="roadmapForm" class="bg-white bg-opacity-10 backdrop-blur-md rounded-xl p-8 shadow-lg text-white">
+          <fieldset class="border-2 border-white border-opacity-30 rounded-lg p-6">
+            <legend class="text-2xl font-bold mb-4 px-2">Choose</legend>
+
+            <div class="mb-4">
+              <label for="skill-level" class="block mb-2 font-semibold">Current Skill</label>
+              <select id="skill-level" name="skillLevel" class="w-full p-2 rounded bg-white text-black focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+              </select>
+            </div>
+
+            <div class="mb-4">
+              <label for="aoi" class="block mb-2 font-semibold">Area of Interest</label>
+              <select id="aoi" name="aoi" class="w-full p-2 rounded bg-white text-black focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+                <option value="Web Development">Web Development</option>
+                <option value="Android Development">Android Development</option>
+                <option value="Machine Learning">Machine Learning</option>
+                <option value="Artificial Intelligence">Artificial Intelligence</option>
+                <option value="Big Data Analytics">Big Data Analytics</option>
+                <option value="Cyber Security">Cyber Security</option>
+                <option value="Blockchain">Blockchain</option>
+                <option value="Data Science">Data Science</option>
+                <option value="Internet of Things">Internet of Things</option>
+              </select>
+            </div>
+
+            <div class="mb-4">
+              <label class="block mb-2 font-semibold">Preferred Pace</label>
+              <div class="flex gap-4">
+                <label class="flex items-center gap-1">
+                  <input type="radio" name="pace" value="Slow" class="accent-blue-400" required> Slow
+                </label>
+                <label class="flex items-center gap-1">
+                  <input type="radio" name="pace" value="Moderate" class="accent-blue-400"> Moderate
+                </label>
+                <label class="flex items-center gap-1">
+                  <input type="radio" name="pace" value="Fast" class="accent-blue-400"> Fast
+                </label>
+              </div>
+            </div>
+
+            <div class="mb-6">
+              <label for="Goals" class="block mb-2 font-semibold">Goals</label>
+              <select id="Goals" name="goal" class="w-full p-2 rounded bg-white text-black focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+                <option value="Project">Project</option>
+                <option value="Upskill">Upskill</option>
+                <option value="Job">Job</option>
+                <option value="Startup">Startup</option>
+              </select>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+              Generate Roadmap
+            </button>
+          </fieldset>
+        </form>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    document.getElementById("roadmapForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const skillLevel = document.getElementById("skill-level").value;
+      const aoi = document.getElementById("aoi").value;
+      const pace = document.querySelector("input[name='pace']:checked").value;
+      const goal = document.getElementById("Goals").value;
+
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+
+      if (!token || !userId) {
+        alert("You must login first");
+        window.location.href = "login.html";
+        return;
+      }
+
+      try {
+        const res = await fetch("http://localhost:5000/api/roadmap/generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({ skillLevel, aoi, pace, goal, userId }),
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          localStorage.setItem("roadmapData", JSON.stringify(data.roadmap));
+          localStorage.setItem("roadmapId", data.roadmapId);
+
+          window.location.href = "roadmap.html";
+        } else {
+          alert( + data.message);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Server error");
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("roadmapData");
+      localStorage.removeItem("roadmapId");
+      window.location.href = "login.html";
+    });
+  </script>
+
+</body>
+</html>

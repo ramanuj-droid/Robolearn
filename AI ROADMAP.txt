@@ -1,0 +1,318 @@
+Overview — What it does
+
+A backend service that ingests a user’s current skills, goals, constraints (time per week, target role, preferred formats),
+and returns a personalized learning roadmap (topics, order, estimated time, resources, checkpoints, quizzes).
+The AI (LLM) composes the roadmap; the backend handles user profiles, storage, orchestration, caching, analytics, and integrations (Coursera, YouTube, GitHub, etc).
+
+Core features (MVP → Advanced)
+MVP
+
+1. User Registration & Login
+Secure sign-up and login system.
+Password hashing using bcrypt.
+JWT token-based authentication to protect routes.
+
+2. Skill Assessment Form
+Simple HTML form where users input:
+Current skills.
+Career goals.
+Preferred learning pace (daily/weekly hours).
+Sends data to backend via JSON request.
+
+3. AI-Powered Roadmap Generation
+
+Backend calls an AI API (e.g., OpenAI) with user’s skill data.
+AI creates a custom step-by-step learning path.
+Includes: Topics, sequence, difficulty progression, and estimated completion time.
+
+4. Roadmap Storage & Retrieval
+
+Save generated roadmaps in MongoDB.
+Each roadmap linked to the specific user account.
+Users can retrieve and view old roadmaps anytime.
+
+5. Roadmap Editing & Regeneration
+
+User can tweak roadmap parameters (goal, hours/week, skill focus).
+AI regenerates a new improved plan without losing old ones.
+
+6. Export & Sharing
+
+Option to export roadmap as PDF or JSON file.
+Option to share a public link (read-only) with friends.
+
+7. Progress Tracking (Optional MVP+ Feature)
+
+User marks topics as completed.
+AI updates the roadmap dynamically.
+
+8. Admin Dashboard
+
+View all registered users.
+Check how many roadmaps generated.
+Option to delete or block users.
+
+9. Deployment with Docker & Cloud
+
+App containerized with Docker.
+Deployment on free-tier cloud (Render, Railway, or Fly.io).
+
+10. Security & Rate Limiting
+JWT for authentication.
+
+Helmet.js for securing HTTP headers.
+Limit roadmap requests per user per day.
+
+
+
+
+*v1 (useful product)
+
+Multi-step roadmaps (modules, lessons, exercises).
+Resource linking (YouTube, docs, courses) — scraped or API-provided.
+Progress tracking and simple quiz generator for checkpoints.
+Versioning & edit history for roadmaps.
+
+Rate-limiting, caching, user auth (JWT).
+
+*v2 (advanced)
+
+Adaptive updates: roadmap adjusts based on quiz results and progress.
+Collaborative features: share roadmaps, mentor review.
+Multi-modal inputs: GitHub repo analysis / CV upload to auto-detect skills.
+A/B testing different curricula and measuring outcomes.
+
+---------------------------------------------------------------------------------
+
+Monetization: premium/paid curated paths, API access for enterprises.
+
+High-level architecture
+Frontend (React/Next.js) — profile UI, roadmap viewer, quizzes.
+Backend API (FastAPI / NestJS) — auth, orchestration, DB.
+LLM Service (OpenAI / Anthropic / local Llama2/GPT-J) — roadmap generation & QA.
+Vector DB (Pinecone/Weaviate) — store resource embeddings for semantic search.
+Relational DB (Postgres) — users, roadmap metadata, progress.
+Worker queue (Celery/RabbitMQ or RQ) — async tasks (generate, fetch resources, quizzes).
+Caching (Redis) — rate-limits, generated items cache.
+Integrations: OAuth for GitHub, APIs for course platforms.
+
+
+Data model (simplified)
+
+User
+id, name, email, role, weekly_hours, target_role, deadline, created_at
+
+Skill
+id, name, level (0–5), last_used
+
+Roadmap
+id, user_id, title, goal, created_at, updated_at, status
+
+Module
+id, roadmap_id, order, title, est_hours, description
+
+Lesson
+id, module_id, order, title, est_minutes, resources[], quiz_id (optional)
+
+Resource
+id, type (video/article/course), url, title, difficulty, trust_score, embedding
+
+Progress
+user_id, roadmap_id, lesson_id, status (not_started/in_progress/done), score
+
+API endpoints (examples)
+POST /api/v1/roadmaps/generate
+
+Body:
+
+
+{
+  "user_id": "u123",
+  "current_skills": [{"name":"Python","level":3},{"name":"SQL","level":2}],
+  "target_role":"Data Scientist",
+  "weekly_hours":8,
+  "deadline":"2025-11-01",
+  "preferred_formats":["video","interactive"],
+  "constraints":{"budget_per_month":30}
+}
+Response: roadmap_id + summary
+
+GET /api/v1/roadmaps/{id} → full roadmap JSON
+POST /api/v1/roadmaps/{id}/feedback → adapt roadmap
+POST /api/v1/upload/github → analyze repo for skill inference
+LLM prompt design (templates)
+Use a structured prompt + few-shot examples. Keep system message precise and include constraints (word counts, time estimates).
+
+System:
+
+You are a professional learning-path architect. Produce structured JSON containing modules, lessons, estimations, and resources. Preserve user constraints. Use concise titles.
+User (input + instruction):
+
+
+User profile:
+- Current skills: Python (3/5), SQL (2/5)
+- Target role: Data Scientist (entry-level)
+- Weekly hours: 8
+- Deadline: 2025-11-01 (12 weeks)
+- Preferred formats: video, interactive
+- Budget: $30/month
+
+Task: Produce a 12-week roadmap divided into modules (weeks), each week contains topics, learning goals, lessons (with 1-3 resources) and estimated hours. Output strictly as JSON with keys: roadmap_title, total_weeks, modules:[{week, title, est_hours, lessons:[{title, minutes, resources:[{title,url,type}]},...]}]. Ensure beginner-friendly sequencing and one weekly checkpoint quiz.
+Few-shot example snippet (short) can be added to improve structure.
+
+Resource pipeline
+Option A: Curate resource database manually + embeddings for semantic matching.
+Option B: On-demand web search (scrape trusted sources: YouTube, freeCodeCamp, official docs) — backend fetches, rates and caches resources, then LLM selects best links.
+Store resource metadata + embedding for future reuse.
+
+Quiz & assessment
+Generate short MCQs or coding tasks per checkpoint via LLM.
+Auto-grade objective MCQs; for coding tasks, run tests in sandboxed container (Docker) or use unit-test harness (careful w/ security).
+Use quiz performance to adapt pacing/contents.
+Adaptivity rules (simple)
+If user scores < 60% on a checkpoint, insert a remediation module (extra practice + alternate resources).
+If user completes early or scores >90% consistently, accelerate roadmap (compress weeks).
+
+Caching, costs & safety
+Cache LLM outputs for same input to save costs.
+
+Rate-limit generation; use async workers and queue.
+Sanitize and validate all external resource URLs.
+Sensitive data: don't log PII; offer option to delete user data.
+Evaluation metrics
+User engagement: lessons completed / week.
+
+Accuracy of skill inference (compare declared vs detected).
+
+Learning outcomes: checkpoint pass rates.
+Time-to-goal completion.
+User satisfaction (NPS).
+Tech stack suggestion (practical)
+Backend: FastAPI (Python) or NestJS (TypeScript)
+
+LLM:  for offline: Llama2 with RAG
+
+Vector DB: Pinecone or Weaviate
+DB: PostgreSQL
+Queue: Redis + RQ or Celery + RabbitMQ
+Auth: JWT + OAuth2 (for GitHub)
+
+Deployment: Docker, Kubernetes (for scale) or Vercel + Render for smaller deployments
+
+Development milestones (12–16 weeks plan)
+Week 1–2 — Design & MVP
+
+Data model, basic API, auth.
+Simple LLM prompt for static roadmap generation.
+Minimal frontend to input profile + display roadmap.
+
+Week 3–4 — Resources & persistence
+
+Resource ingestion & storage.
+Save & view roadmaps; basic caching.
+
+Week 5–7 — Quizzes & progress
+
+Quiz generation and grading.
+Progress tracking and basic adaptivity logic.
+
+Week 8–10 — Integrations & automation
+
+GitHub skill inference, course APIs, vector DB for resource search.
+Improve prompt templates & few-shot examples.
+
+Week 11–12 — Polish & deploy
+
+Monitoring, billing/cost optimization, user settings.
+Beta testing with users, collect feedback.
+
+
+{
+  "roadmap_title": "12-week Data Scientist - From Python basics to ML pipeline",
+  "total_weeks": 12,
+  "modules":[
+    {"week":1,"title":"Python & Data Basics","est_hours":8,"lessons":[
+      {"title":"Python essentials (variables, control flow)","minutes":120,"resources":[{"title":"Python Crash Course - video","url":"https://youtu.be/xyz","type":"video"}]},
+      {"title":"Intro to Numpy & Pandas","minutes":120,"resources":[{"title":"Pandas Tutorial","url":"https://youtu.be/abc","type":"video"}]}
+    ]},
+    {"week":2,"title":"Data Cleaning & EDA","est_hours":8,...}
+  ]
+}
+Optional extra: monetization & product ideas
+Freemium model: free basic roadmaps, paid curated expert roadmaps or mentorship.
+
+Enterprise version: bulk skill mapping for companies and L&D integrations.
+API access for platforms (e.g., LMS) to auto-generate learning paths for employees.
+
+
+| Layer / Category     | Technology                               | Purpose                                     | Free?                                                                          |
+| -------------------- | ---------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------ |
+| **Frontend**         | HTML5                                    | Structure of web pages                      | ✅                                                                              |
+|                      | CSS3                                     | Styling and layout                          | ✅                                                                              |
+|                      | JavaScript (Vanilla)                     | Client-side interactivity and API calls     | ✅                                                                              |
+| **Backend**          | Node.js (Express.js)                     | API creation, request/response handling     | ✅                                                                              |
+| **Database**         | MongoDB Atlas (Cloud)                    | Store user data, skill progress, roadmaps   | ✅ (free tier)                                                                  |
+| **Authentication**   | JWT (JSON Web Tokens)                    | Secure login & session handling             | ✅                                                                              |
+| **AI/ML**            | OpenAI API / Hugging Face models         | Generate skill roadmaps from user abilities | ✅ (Hugging Face free tier for some models)
+| **Containerization** | Docker                                   | Package and run the backend anywhere        | ✅                                                                              |
+| **Deployment**       | Render / Railway / Vercel (for frontend) | Host backend & frontend online              | ✅ (free tier)                                                                  |
+| **Version Control**  | Git + GitHub                             | Source code management & collaboration      | ✅                                                                              |
+
+
+UI/UX 
+
+
+1. Landing Page
+
+Clean hero section with title, tagline, and a short description.
+“Get Started” button leading to input form.
+
+2. Goal & Preferences Form
+
+Step-by-step form (wizard style) for:
+Learning goal or role selection.
+Timeframe selection.
+Difficulty level.
+Preferred learning style (video, text, projects).
+Progress bar showing completion percentage.
+
+3. Roadmap Display
+
+Card-based layout for each milestone.
+Skills shown in chronological order with progress indicators.
+Collapsible sections for details (resources, projects).
+Tags for difficulty level and estimated completion time.
+
+4. Resource Integration
+
+Direct clickable links to suggested resources.
+Icons to indicate type (YouTube, article, GitHub, etc.).
+
+5. Progress Tracking
+
+Checkboxes or toggles to mark a skill/milestone as complete.
+Visual progress bar at the top of the roadmap.
+
+6. Responsive Design
+
+Mobile-first layout with collapsible menus and vertical card stacking.
+
+7. Color Scheme & Styling
+Soft, modern gradient background.
+Accent colors for buttons and progress indicators.
+
+
+
+FUTURE
+
+
+| Feature                     | UI Elements                                                       | UX Goals                                  | Notes                                                                   |
+| --------------------------- | ----------------------------------------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------- |
+| **Badges & Achievements**   | Badge icons, achievement cards, pop-up when unlocked              | Reward progress, motivate completion      | Can be themed (gold, silver, bronze) for milestones                     |
+| **Leaderboard**             | Ranking table, profile picture thumbnails, points display         | Foster healthy competition among learners | Could have filters (class-wise, region-wise, subject-wise)              |
+| **Streak Tracker**          | Calendar view with streak highlights, counter at top of dashboard | Encourage daily learning habits           | Could show "Longest Streak" and "Current Streak"                        |
+| **XP & Level System**       | Progress bar, current level badge                                 | Create sense of progression               | XP earned from completing lessons, quizzes, challenges                  |
+| **Weekly Challenges**       | Card layout with challenge description & progress tracker         | Engage learners in short-term goals       | Can reset every Monday                                                  |
+| **Community Quests**        | Group challenge board with joint progress meter                   | Promote collaboration                     | Example: “Complete 500 practice questions as a group”                   |
+| **Reward Store (Optional)** | Virtual shop with redeemable items using XP                       | Incentivize consistent learning           | Can offer profile customizations, certificates, or early access content |
+

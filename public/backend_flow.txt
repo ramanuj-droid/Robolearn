@@ -1,0 +1,20 @@
+________________________________________________________________________________________________________________________________________________________________________________________
+| Phase                       | Task                              | Details                                                                                               | Status      |
+| --------------------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------|
+|   1. Backend Setup          | Verify existing backend structure | Ensure `server.js`, `db.js`, `routes`, `middleware` are clean and working.                            | ✅Complete  |
+|                             | Add Roadmap Route                 | Create `routes/roadmap.js` for handling roadmap generation.                                           | ✅Complete  |
+|                             | Roadmap Controller                | Parse user input (`skill, pace, topic, goal`) and generate roadmap JSON (initially mock, later AI).   | ✅Complete  |
+|                             | Auth Middleware Integration       | Protect roadmap generation so only logged-in users can access.                                        | ✅Complete  |
+|   2. Roadmap Logic          | Roadmap AI Prompt                 | Integrate with free/paid LLM API (e.g., OpenAI, HuggingFace, Gemini free tier).                       | ✅Complete  |
+|                             | Mock Data Fallback                | If AI is not available, return pre-built sample roadmap JSON.                                         | ✅Complete  |
+|                             | Roadmap Formatting                | Convert roadmap JSON → Table format with columns: `Time, Topic, YouTube, Docs, Practice, Progress`.   | ✅Complete  |
+|   3. Frontend Integration   | Form Submission                   | From `home.html`, POST data to `/api/roadmap`.                                                        | ✅Complete  |
+|                             | Rocket Animation                  | On clicking *Generate Roadmap*, run animation → redirect to `roadmap.html`.                           | ✅Complete  |
+|                             | Roadmap Rendering                 | Display table dynamically in `roadmap.html` with checkboxes.                                          | ✅Complete  |
+|                             | Export Feature                    | Button to export roadmap as PDF/Excel.                                                                | ✅Complete  |
+|   4. User Progress          | Save Progress                     | Each checkbox update should be saved in DB under user profile.                                        | ✅Complete  |
+|                             | Fetch Progress                    | On `roadmap.html` load, show completed/remaining topics.                                              | ✅Complete  |
+|   5. Deployment             | Prepare for Render                | Add `start` script in `package.json`, connect MongoDB Atlas, test routes.                             | ❌ Pending  |
+|                             | Deploy Frontend                   | Serve static `index.html`, `login.html`, `home.html`, `roadmap.html` from Express or host separately. | ❌ Pending  |
+|                             | Environment Variables             | Setup `.env` on Render for DB URI, API keys.                                                          | ❌ Pending  |
+|_____________________________|___________________________________|_______________________________________________________________________________________________________|_____________|

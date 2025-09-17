@@ -1,0 +1,34 @@
+[
+  {
+    "time": "Week 1",
+    "topic": "Basics of Python",
+    "youtube": "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+    "docs": "https://docs.python.org/3/tutorial/",
+    "practice": "Solve 10 problems on variables & loops",
+    "progress": "0%"
+  },
+  {
+    "time": "Week 2",
+    "topic": "Data Structures",
+    "youtube": "https://www.youtube.com/watch?v=RBSGKlAvoiM",
+    "docs": "https://realpython.com/python-data-structures/",
+    "practice": "Implement Stack, Queue, LinkedList",
+    "progress": "0%"
+  },
+  {
+    "time": "Week 3",
+    "topic": "Algorithms",
+    "youtube": "https://www.youtube.com/watch?v=8hly31xKli0",
+    "docs": "https://cp-algorithms.com/",
+    "practice": "Solve 10 problems on sorting & searching",
+    "progress": "0%"
+  },
+  {
+    "time": "Week 4",
+    "topic": "Final Project",
+    "youtube": "https://www.youtube.com/watch?v=rfscVS0vtbw",
+    "docs": "https://docs.python-guide.org/",
+    "practice": "Build a mini project with Python",
+    "progress": "0%"
+  }
+]

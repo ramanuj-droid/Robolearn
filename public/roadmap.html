@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your Roadmap</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-black to-blue-900 min-h-screen flex flex-col items-center justify-center text-white">
+
+  <div id="rocket-container" class="flex flex-col items-center justify-center h-screen">
+    <div class="rocket text-6xl animate-bounce">🚀</div>
+    <p class="mt-6 text-lg">Launching your roadmap...</p>
+  </div>
+
+  <h2 class="text-2xl font-bold mb-4 hidden" id="roadmapTitle">Your Roadmap</h2>
+
+  <table class="w-full border border-gray-300 text-sm hidden" id="roadmapTable">
+    <thead class="bg-blue-600 text-white">
+      <tr>
+        <th class="p-2">✔</th>
+        <th class="p-2">Time</th>
+        <th class="p-2">Topic</th>
+        <th class="p-2">YouTube</th>
+        <th class="p-2">Docs</th>
+        <th class="p-2">Practice</th>
+      </tr>
+    </thead>
+    <tbody id="roadmapBody"></tbody>
+  </table>
+
+  <button id="exportPDF" class="mt-2 px-4 py-2 bg-green-600 rounded text-white hidden">
+    Export to PDF
+  </button>
+
+  <script>
+  // Escape function
+  function escapeHtml(s) {
+    return String(s || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function renderRoadmap(items, roadmapId, savedProgress = []) {
+    document.getElementById("roadmapTitle").classList.remove("hidden");
+    const tbody = document.getElementById('roadmapBody');
+    tbody.innerHTML = '';
+    items.forEach((it, idx) => {
+      const isCompleted = savedProgress.includes(idx) || it.progress >= 100;
+      const tr = document.createElement('tr');
+      tr.className = "border-b";
+      tr.innerHTML = `
+        <td class="p-2 text-center">
+          <input type="checkbox" data-step="${idx}" ${isCompleted ? 'checked' : ''}>
+        </td>
+        <td class="p-2">${escapeHtml(it.time)}</td>
+        <td class="p-2 font-semibold">${escapeHtml(it.topic)}</td>
+        <td class="p-2">
+          ${it.youtube ? `<a href="${escapeHtml(it.youtube)}" target="_blank" class="text-blue-600 underline">Watch</a>` : ''}
+        </td>
+        <td class="p-2">
+          ${it.docs ? `<a href="${escapeHtml(it.docs)}" target="_blank" class="text-blue-600 underline">Docs</a>` : ''}
+        </td>
+        <td class="p-2">${escapeHtml(it.practice)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.addEventListener("change", async (e) => {
+    if (e.target.type === "checkbox") {
+      const stepIndex = e.target.dataset.step;
+      const completed = e.target.checked;
+
+      const userId = localStorage.getItem("userId");
+      const roadmapId = localStorage.getItem("roadmapId");
+      if (!userId || !roadmapId) return;
+
+      try {
+        await fetch(`http://localhost:5000/api/roadmap/progress/save`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+          },
+          body: JSON.stringify({ userId, roadmapId, stepIndex, completed }),
+        });
+      } catch (err) {
+        console.error("Save progress failed:", err);
+      }
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    setTimeout(async () => {
+      document.getElementById("rocket-container").style.display = "none";
+
+      const roadmap = JSON.parse(localStorage.getItem("roadmapData") || "null");
+      const roadmapId = localStorage.getItem("roadmapId");
+      const userId = localStorage.getItem("userId");
+
+      if (!roadmap || !roadmapId || !userId) {
+        document.getElementById('roadmapBody').innerHTML =
+          '<tr><td colspan="6" class="p-4 text-center">❌ No roadmap found or user not logged in</td></tr>';
+        return;
+      }
+
+      try {
+        const res = await fetch(`http://localhost:5000/api/roadmap/progress/${userId}/${roadmapId}`, {
+          headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+        });
+        const data = await res.json();
+        const savedSteps = Object.keys(data.progress || {}).map(Number);
+        renderRoadmap(roadmap, roadmapId, savedSteps);
+      } catch (err) {
+        console.error("Fetch progress failed:", err);
+        renderRoadmap(roadmap, roadmapId);
+      }
+
+      document.getElementById("roadmapTable").classList.remove("hidden");
+      document.getElementById("exportPDF").classList.remove("hidden");
+    }, 2000);
+  });
+
+  document.getElementById('exportPDF').addEventListener('click', () => {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
+    const headers = [["✔", "Time", "Topic", "YouTube", "Docs", "Practice"]];
+    const rows = [];
+    const roadmap = JSON.parse(localStorage.getItem("roadmapData") || "[]");
+
+    roadmap.forEach(it => {
+      rows.push([
+        it.progress >= 100 ? "✔" : "",
+        it.time,
+        it.topic,
+        it.youtube || "",
+        it.docs || "",
+        it.practice || ""
+      ]);
+    });
+
+    pdf.autoTable({
+      head: headers,
+      body: rows,
+      startY: 20,
+      theme: "grid",
+      headStyles: { fillColor: [37, 99, 235] },
+    });
+
+    pdf.save("roadmap.pdf");
+  });
+  </script>
+
+</body>
+</html>

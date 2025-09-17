@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Roadmap</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-900 to-black min-h-screen flex flex-col items-center py-10 text-white">
+
+  <header class="w-full bg-blue-700 p-6 text-center shadow-lg">
+    <h1 class="text-3xl font-bold">🚀 Your Personalized Roadmap</h1>
+    <p class="mt-2 text-lg">Generated based on your preferences</p>
+  </header>
+
+  <main class="mt-10 w-full max-w-5xl">
+    <div class="bg-white bg-opacity-10 backdrop-blur-md rounded-xl p-8 shadow-lg">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-blue-600 bg-opacity-40">
+            <th class="p-3">✅</th>
+            <th class="p-3">Time</th>
+            <th class="p-3">Topic</th>
+            <th class="p-3">YouTube</th>
+            <th class="p-3">Documentation</th>
+            <th class="p-3">Practice</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% roadmap.forEach((step, index) => { %>
+            <tr class="hover:bg-blue-800 hover:bg-opacity-30">
+              <td class="p-3">
+                <input type="checkbox" name="progress" value="<%= index %>" class="accent-blue-400">
+              </td>
+              <td class="p-3"><%= step.time %></td>
+              <td class="p-3 font-semibold"><%= step.topic %></td>
+              <td class="p-3 text-blue-300 underline">
+                <a href="<%= step.youtube %>" target="_blank">Watch</a>
+              </td>
+              <td class="p-3 text-blue-300 underline">
+                <a href="<%= step.docs %>" target="_blank">Read</a>
+              </td>
+              <td class="p-3 text-blue-300 underline">
+                <a href="<%= step.practice %>" target="_blank">Practice</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <div class="mt-6 flex gap-4">
+    <form action="/api/roadmap/export/pdf" method="POST">
+      <button class="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-lg font-semibold">📄 Export PDF</button>
+    </form>
+    <form action="/api/roadmap/export/excel" method="POST">
+      <button class="bg-green-600 hover:bg-green-700 px-6 py-2 rounded-lg font-semibold">📊 Export Excel</button>
+    </form>
+  </div>
+
+</body>
+</html>
