@@ -48,25 +48,22 @@
   <p class="text-3xl font-bold mb-6 text-center">Recommended Roadmaps</p>
 
   <div class="flex flex-col gap-4">
-    <!--1-->
     <div class="bg-blue-600 rounded-xl p-4 w-full text-center shadow-lg transform animate-float hover:scale-105 transition duration-300">
       <h3 class="text-xl font-semibold mb-2">Learn AI</h3>
       <p class="text-white text-sm">Learn AI at your own pace with structured lessons and exercises.</p>
     </div>
 
-    <!--2-->
     <div class="bg-blue-600 rounded-xl p-4 w-full text-center shadow-lg transform animate-float hover:scale-105 transition duration-300">
       <h3 class="text-xl font-semibold mb-2">Create Projects</h3>
       <p class="text-white text-sm">Apply your knowledge by building real-world projects.</p>
     </div>
 
-    <!--3-->
     <div class="bg-blue-600 rounded-xl p-4 w-full text-center shadow-lg transform animate-float hover:scale-105 transition duration-300">
       <h3 class="text-xl font-semibold mb-2">Upskill</h3>
       <p class="text-white text-sm">Enhance your career prospects with hands-on skills.</p>
     </div>
 
-    <!--4-->
+
     <div class="bg-blue-600 rounded-xl p-4 w-full text-center shadow-lg transform animate-float hover:scale-105 transition duration-300">
       <h3 class="text-xl font-semibold mb-2">Community</h3>
       <p class="text-white text-sm">Collaborate and learn with like-minded peers.</p>
@@ -74,7 +71,6 @@
   </div>
 </div>
 
-        <!-- Roadmap Form -->
         <form id="roadmapForm" class="bg-white bg-opacity-10 backdrop-blur-md rounded-xl p-8 shadow-lg text-white">
           <fieldset class="border-2 border-white border-opacity-30 rounded-lg p-6">
             <legend class="text-2xl font-bold mb-4 px-2">Choose</legend>
@@ -157,7 +153,7 @@
       }
 
       try {
-        const res = await fetch("http://localhost:5000/api/roadmap/generate", {
+        const res = await fetch("https://robolearn.onrender.com/api/roadmap/generate", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -192,3 +188,4 @@
 
 </body>
 </html>
+
