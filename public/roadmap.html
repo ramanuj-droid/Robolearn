@@ -36,7 +36,6 @@
   </button>
 
   <script>
-  // Escape function
   function escapeHtml(s) {
     return String(s || "")
       .replace(/&/g, "&amp;")
@@ -80,7 +79,7 @@
       if (!userId || !roadmapId) return;
 
       try {
-        await fetch(`http://localhost:5000/api/roadmap/progress/save`, {
+        await fetch(`https://robolearn.onrender.com/api/roadmap/progress/save`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -104,12 +103,12 @@
 
       if (!roadmap || !roadmapId || !userId) {
         document.getElementById('roadmapBody').innerHTML =
-          '<tr><td colspan="6" class="p-4 text-center">❌ No roadmap found or user not logged in</td></tr>';
+          '<tr><td colspan="6" class="p-4 text-center"> No roadmap found or user not logged in</td></tr>';
         return;
       }
 
       try {
-        const res = await fetch(`http://localhost:5000/api/roadmap/progress/${userId}/${roadmapId}`, {
+        const res = await fetch(`https://robolearn.onrender.com/api/roadmap/progress/${userId}/${roadmapId}`, {
           headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
         });
         const data = await res.json();
@@ -157,3 +156,4 @@
 
 </body>
 </html>
+
